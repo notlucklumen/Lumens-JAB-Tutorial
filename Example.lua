@@ -42,7 +42,7 @@ local function setR6()
 
     if humanoid.RigType == Enum.HumanoidRigType.R15 then
         runCmd('-r6', 0.6, function()
-            return humanoid.HumanoidRigType == HumanoidEnum.RigType.R6
+            return humanoid.HumanoidRigType == Enum.HumanoidRigType.R6
         end)
     end
 end
