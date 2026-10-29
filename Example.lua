@@ -135,17 +135,26 @@ end
 
 local freed = setmetatable({}, {__mode = 'k'})
 
-clean(runService.Heartbeat:Connect(function()
+local smooth = setmetatable({}, {__mode = 'k'})
+local blendSpeed = 12
+
+clean(runService.Heartbeat:Connect(function(dt)
     local char = lplr.Character
     local pose = Animations[currentAnimation]
     local root = char and char:FindFirstChild('HumanoidRootPart')
     if not root or not pose then return end
     local t = os.clock()
+    local alpha = 1 - math.exp(-dt * blendSpeed)
     for name, d in pose do
         local inst = char:FindFirstChild(name, true)
         if inst then
             local cf = CFrame.new(wave(d, 'xpos', t), wave(d, 'ypos', t), wave(d, 'zpos', t))
                 * CFrame.Angles(math.rad(wave(d, 'xrot', t)), math.rad(wave(d, 'yrot', t)), math.rad(wave(d, 'zrot', t)))
+            local prev = smooth[inst] or (inst:IsA('Motor6D') and CFrame.identity)
+            if prev then
+                cf = prev:Lerp(cf, alpha)
+            end
+            smooth[inst] = cf
             if inst:IsA('Motor6D') then
                 origins[inst] = origins[inst] or inst.C0
                 inst.C0 = origins[inst] * cf
